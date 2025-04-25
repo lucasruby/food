@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizzaria Catalana - Demonstração</title>
+  <style>
+    /* Estilos gerais */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      line-height: 1.6;
+    }
+    
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    /* Cabeçalho */
+    .app-header {
+      background-color: #d32f2f;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .app-header h1 {
+      margin: 0;
+      font-size: 28px;
+      text-align: center;
+      flex-grow: 1;
+    }
+    
+    .back-button {
+      background-color: white;
+      color: #d32f2f;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .back-button:hover {
+      background-color: #f0f0f0;
+    }
+    
+    /* Conteúdo principal */
+    .app-content {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* Tela inicial */
+    .home-screen {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .status-indicator {
+      font-size: 20px;
+      margin-bottom: 30px;
+      padding: 15px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .status-running {
+      color: green;
+      font-weight: bold;
+    }
+    
+    .status-stopped {
+      color: red;
+      font-weight: bold;
+    }
+    
+    .main-buttons {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .big-button {
+      padding: 25px;
+      font-size: 24px;
+      font-weight: bold;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    
+    .big-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .start-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .stop-button {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .orders-button {
+      background-color: #2196F3;
+      color: white;
+    }
+    
+    .instructions {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .instructions h2 {
+      color: #333;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+    
+    .instructions p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 15px 0;
+    }
+    
+    /* Tela de QR Code */
+    .qrcode-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .qrcode-screen h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+    
+    .qrcode-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    
+    .qrcode-container img {
+      width: 250px;
+      height: 250px;
+    }
+    
+    .loading {
+      font-size: 20px;
+      margin: 30px 0;
+      color: #666;
+    }
+    
+    .qrcode-instructions {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .qrcode-instructions p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 15px 0;
+    }
+    
+    /* Tela de Pedidos */
+    .orders-screen {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .orders-screen h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+    
+    .no-orders {
+      text-align: center;
+      font-size: 20px;
+      color: #666;
+      margin: 40px 0;
+    }
+    
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .order-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-left: 10px solid #ccc;
+    }
+    
+    .order-card.status-novo {
+      border-left-color: #ff9800;
+    }
+    
+    .order-card.status-pronto {
+      border-left-color: #4CAF50;
+    }
+    
+    .order-card.status-entregue {
+      border-left-color: #2196F3;
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .order-header h3 {
+      margin: 0;
+      font-size: 22px;
+      color: #333;
+    }
+    
+    .order-time {
+      font-size: 18px;
+      color: #666;
+    }
+    
+    .order-customer, .order-items, .order-total, .order-status {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .order-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .action-button {
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .ready-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .delivered-button {
+      background-color: #2196F3;
+      color: white;
+    }
+    
+    .print-button {
+      background-color: #9E9E9E;
+      color: white;
+    }
+    
+    /* Rodapé */
+    .app-footer {
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .app-header h1 {
+        font-size: 24px;
+      }
+      
+      .big-button {
+        padding: 20px;
+        font-size: 20px;
+      }
+      
+      .instructions p, .qrcode-instructions p {
+        font-size: 16px;
+      }
+      
+      .order-header h3 {
+        font-size: 20px;
+      }
+      
+      .order-customer, .order-items, .order-total, .order-status {
+        font-size: 16px;
+      }
+      
+      .action-button {
+        padding: 12px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Pizzaria Catalana</h1>
+      <button id="backButton" class="back-button" style="display: none;">Voltar para Início</button>
+    </header>
+
+    <main class="app-content">
+      <!-- Tela Inicial -->
+      <div id="homeScreen" class="home-screen">
+        <div class="status-indicator">
+          Status do Bot: <span id="botStatus" class="status-stopped">DESATIVADO</span>
+        </div>
+        
+        <div class="main-buttons">
+          <button id="startButton" class="big-button start-button">INICIAR BOT</button>
+          <button id="stopButton" class="big-button stop-button" style="display: none;">PARAR BOT</button>
+          <button id="ordersButton" class="big-button orders-button">VER PEDIDOS</button>
+        </div>
+        
+        <div class="instructions">
+          <h2>Instruções:</h2>
+          <p>1. Clique em "INICIAR BOT" para começar a receber pedidos</p>
+          <p>2. Escaneie o código QR com o WhatsApp quando aparecer</p>
+          <p>3. Clique em "VER PEDIDOS" para ver os pedidos recebidos</p>
+          <p>4. Clique em "PARAR BOT" para desativar o atendimento</p>
+        </div>
+      </div>
+
+      <!-- Tela de QR Code -->
+      <div id="qrcodeScreen" class="qrcode-screen">
+        <h2>Escaneie este código QR com o WhatsApp</h2>
+        <div id="qrcodeLoading" class="loading">Gerando código QR...</div>
+        <div id="qrcodeContainer" class="qrcode-container" style="display: none;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WhatsAppConnection" alt="QR Code para WhatsApp">
+        </div>
+        <div class="qrcode-instructions">
+          <p>1. Abra o WhatsApp no seu celular</p>
+          <p>2. Toque em Menu ou Configurações e selecione WhatsApp Web</p>
+          <p>3. Aponte a câmera do seu celular para este código</p>
+          <p>4. Aguarde a conexão ser estabelecida</p>
+        </div>
+      </div>
+
+      <!-- Tela de Pedidos -->
+      <div id="ordersScreen" class="orders-screen">
+        <h2>Pedidos</h2>
+        <div class="orders-list">
+          <div class="order-card status-novo">
+            <div class="order-header">
+              <h3>Pedido #001</h3>
+              <span class="order-time">19:30</span>
+            </div>
+            <div class="order-customer">
+              <strong>Cliente:</strong> João Silva
+            </div>
+            <div class="order-items">
+              <strong>Itens:</strong> 1 Pizza Grande Calabresa, 1 Coca-Cola 2L
+            </div>
+            <div class="order-total">
+              <strong>Total:</strong> R$ 64,99
+            </div>
+            <div class="order-status">
+              <strong>Status:</strong> <span class="order-status-text">Novo</span>
+            </div>
+            <div class="order-actions">
+              <button class="action-button ready-button" onclick="markOrderReady(this)">MARCAR COMO PRONTO</button>
+              <button class="action-button print-button">IMPRIMIR PEDIDO</button>
+            </div>
+          </div>
+
+          <div class="order-card status-pronto">
+            <div class="order-header">
+              <h3>Pedido #002</h3>
+              <span class="order-time">19:15</span>
+            </div>
+            <div class="order-customer">
+              <strong>Cliente:</strong> Maria Oliveira
+            </div>
+            <div class="order-items">
+              <strong>Itens:</strong> 1 Pizza Grande A Moda, 1 Guaraná 2L
+            </div>
+            <div class="order-total">
+              <strong>Total:</strong> R$ 64,99
+            </div>
+            <div class="order-status">
+              <strong>Status:</strong> <span class="order-status-text">Pronto</span>
+            </div>
+            <div class="order-actions">
+              <button class="action-button delivered-button" onclick="markOrderDelivered(this)">MARCAR COMO ENTREGUE</button>
+              <button class="action-button print-button">IMPRIMIR PEDIDO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>Pizzaria Catalana - Sistema de Atendimento</p>
+    </footer>
+  </div>
+
+  <script>
+    // Elementos da interface
+    const homeScreen = document.getElementById('homeScreen');
+    const qrcodeScreen = document.getElementById('qrcodeScreen');
+    const ordersScreen = document.getElementById('ordersScreen');
+    const botStatus = document.getElementById('botStatus');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const ordersButton = document.getElementById('ordersButton');
+    const backButton = document.getElementById('backButton');
+    const qrcodeLoading = document.getElementById('qrcodeLoading');
+    const qrcodeContainer = document.getElementById('qrcodeContainer');
+
+    // Estado do bot
+    let botRunning = false;
+
+    // Função para mostrar a tela inicial
+    function showHomeScreen() {
+      homeScreen.style.display = 'flex';
+      qrcodeScreen.style.display = 'none';
+      ordersScreen.style.display = 'none';
+      backButton.style.display = 'none';
+    }
+
+    // Função para mostrar a tela de QR code
+    function showQRCodeScreen() {
+      homeScreen.style.display = 'none';
+      qrcodeScreen.style.display = 'flex';
+      ordersScreen.style.display = 'none';
+      backButton.style.display = 'block';
+      
+      // Simular carregamento do QR code
+      qrcodeLoading.style.display = 'block';
+      qrcodeContainer.style.display = 'none';
+      
+      setTimeout(() => {
+        qrcodeLoading.style.display = 'none';
+        qrcodeContainer.style.display = 'block';
+      }, 2000);
+    }
+
+    // Função para mostrar a tela de pedidos
+    function showOrdersScreen() {
+      homeScreen.style.display = 'none';
+      qrcodeScreen.style.display = 'none';
+      ordersScreen.style.display = 'block';
+      backButton.style.display = 'block';
+    }
+
+    // Função para iniciar o bot
+    function startBot() {
+      botRunning = true;
+      botStatus.textContent = 'ATIVO';
+      botStatus.className = 'status-running';
+      startButton.style.display = 'none';
+      stopButton.style.display = 'block';
+      showQRCodeScreen();
+    }
+
+    // Função para parar o bot
+    function stopBot() {
+      botRunning = false;
+      botStatus.textContent = 'DESATIVADO';
+      botStatus.className = 'status-stopped';
+      startButton.style.display = 'block';
+      stopButton.style.display = 'none';
+      showHomeScreen();
+    }
+
+    // Função para marcar pedido como pronto
+    function markOrderReady(button) {
+      const orderCard = button.closest('.order-card');
+      orderCard.classList.remove('status-novo');
+      orderCard.classList.add('status-pronto');
+      
+      const statusText = orderCard.querySelector('.order-status-text');
+      statusText.textContent = 'Pronto';
+      
+      const actions = orderCard.querySelector('.order-actions');
+      actions.innerHTML = `
+        <button class="action-button delivered-button" onclick="markOrderDelivered(this)">MARCAR COMO ENTREGUE</button>
+        <button class="action-button print-button">IMPRIMIR PEDIDO</button>
+      `;
+    }
+
+    // Função para marcar pedido como entregue
+    function markOrderDelivered(button) {
+      const orderCard = button.closest('.order-card');
+      orderCard.classList.remove('status-pronto');
+      orderCard.classList.add('status-entregue');
+      
+      const statusText = orderCard.querySelector('.order-status-text');
+      statusText.textContent = 'Entregue';
+      
+      const actions = orderCard.querySelector('.order-actions');
+      actions.innerHTML = `
+        <button class="action-button print-button">IMPRIMIR PEDIDO</button>
+      `;
+    }
+
+    // Adicionar event listeners
+    startButton.addEventListener('click', startBot);
+    stopButton.addEventListener('click', stopBot);
+    ordersButton.addEventListener('click', showOrdersScreen);
+    backButton.addEventListener('click', showHomeScreen);
+
+    // Inicializar a tela inicial
+    showHomeScreen();
+  </script>
+</body>
+</html>
